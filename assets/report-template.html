@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{PROJECT_NAME}} GitHub 项目学习报告">
+  <title>{{PROJECT_NAME}}｜Github分析雷达</title>
+  <style>
+    :root {
+      --background: #f5f7fb;
+      --surface: #ffffff;
+      --surface-soft: #eef4ff;
+      --text: #172033;
+      --muted: #61708a;
+      --border: #dce3ef;
+      --primary: #2457d6;
+      --primary-dark: #173b96;
+      --accent: #f2a93b;
+      --confirmed: #16794c;
+      --inferred: #9a6300;
+      --unknown: #a33a3a;
+      --shadow: 0 16px 40px rgba(29, 48, 84, 0.08);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--background);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.7;
+    }
+
+    a {
+      color: var(--primary);
+      text-underline-offset: 3px;
+    }
+
+    code {
+      padding: 0.14em 0.4em;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #f7f9fc;
+      color: var(--primary-dark);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      overflow-wrap: anywhere;
+    }
+
+    .page {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 72px;
+    }
+
+    .hero {
+      padding: clamp(28px, 5vw, 56px);
+      border-radius: 26px;
+      background: linear-gradient(135deg, #183c98 0%, #2457d6 68%, #376ce5 100%);
+      color: #ffffff;
+      box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: #dce7ff;
+      font-size: 0.86rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    h1,
+    h2,
+    h3 {
+      line-height: 1.25;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 4.2rem);
+      letter-spacing: -0.04em;
+    }
+
+    .summary {
+      max-width: 780px;
+      margin: 18px 0 0;
+      color: #edf3ff;
+      font-size: clamp(1rem, 1.8vw, 1.18rem);
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .meta span,
+    .meta a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 7px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .nav {
+      position: sticky;
+      top: 12px;
+      z-index: 10;
+      display: flex;
+      gap: 8px;
+      margin: 18px 0;
+      padding: 10px;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 8px 24px rgba(29, 48, 84, 0.07);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav a {
+      flex: 0 0 auto;
+      padding: 7px 10px;
+      border-radius: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .nav a:hover,
+    .nav a:focus-visible {
+      background: var(--surface-soft);
+      color: var(--primary);
+    }
+
+    section {
+      margin-top: 18px;
+      padding: clamp(22px, 4vw, 38px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    section h2 {
+      margin: 0 0 20px;
+      font-size: clamp(1.45rem, 3vw, 2rem);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #ffffff;
+    }
+
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+    }
+
+    .card p:last-child,
+    .card ul:last-child {
+      margin-bottom: 0;
+    }
+
+    .label {
+      margin: 0 0 8px;
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+    }
+
+    .structure {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .structure th,
+    .structure td {
+      padding: 13px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .structure th {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .learning-point {
+      padding: 22px;
+      border-left: 4px solid var(--accent);
+      border-radius: 0 14px 14px 0;
+      background: #fffbf3;
+    }
+
+    .learning-point + .learning-point {
+      margin-top: 14px;
+    }
+
+    .route {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: route-step;
+    }
+
+    .route li {
+      position: relative;
+      padding: 18px 18px 18px 64px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #ffffff;
+      counter-increment: route-step;
+    }
+
+    .route li::before {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #ffffff;
+      content: counter(route-step);
+      font-weight: 800;
+    }
+
+    .status {
+      display: inline-flex;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .status.confirmed {
+      background: #e9f7f0;
+      color: var(--confirmed);
+    }
+
+    .status.inferred {
+      background: #fff4dc;
+      color: var(--inferred);
+    }
+
+    .status.unknown {
+      background: #fdecec;
+      color: var(--unknown);
+    }
+
+    .callout {
+      border: 0;
+      background: var(--surface-soft);
+      color: var(--primary-dark);
+    }
+
+    .callout p {
+      margin: 0;
+      font-size: clamp(1.1rem, 2.2vw, 1.45rem);
+      font-weight: 750;
+    }
+
+    .copy-button {
+      margin-left: 8px;
+      padding: 5px 9px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--primary);
+      cursor: pointer;
+    }
+
+    .copy-button:hover,
+    .copy-button:focus-visible {
+      background: var(--surface-soft);
+    }
+
+    .sources {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    footer {
+      padding: 28px 0 0;
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        width: min(100% - 20px, 1120px);
+        padding-top: 10px;
+      }
+
+      .hero {
+        border-radius: 18px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      section {
+        padding: 20px 16px;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      .structure {
+        min-width: 680px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <p class="eyebrow">GITHUB 分析雷达 · {{REPORT_TYPE}}</p>
+      <h1>{{PROJECT_NAME}}</h1>
+      <p class="summary">{{ONE_LINE_SUMMARY}}</p>
+      <div class="meta">
+        <a href="{{REPOSITORY_URL}}" target="_blank" rel="noopener noreferrer">查看 GitHub 项目</a>
+        <span>版本：{{VERSION}}</span>
+        <span>分析日期：{{ANALYSIS_DATE}}</span>
+      </div>
+    </header>
+
+    <nav class="nav" aria-label="报告导航">
+      <a href="#overview">30 秒看懂</a>
+      <a href="#structure">核心结构</a>
+      <a href="#learning">学习重点</a>
+      <a href="#usage">怎么用上</a>
+      <a href="#route">阅读路线</a>
+      <a href="#review">结论复核</a>
+      <a href="#limits">局限说明</a>
+      <a href="#sources">证据来源</a>
+    </nav>
+
+    <section id="overview">
+      <h2>30 秒看懂项目</h2>
+      <div class="grid">
+        <article class="card">
+          <p class="label">解决的问题</p>
+          {{PROBLEM_HTML}}
+        </article>
+        <article class="card">
+          <p class="label">整体流程</p>
+          {{WORKFLOW_HTML}}
+        </article>
+        <article class="card">
+          <p class="label">可以确认的特点</p>
+          {{DIFFERENCE_HTML}}
+        </article>
+      </div>
+    </section>
+
+    <section id="structure">
+      <h2>项目核心结构</h2>
+      <div class="table-wrap">
+        <table class="structure">
+          <thead>
+            <tr>
+              <th>核心部分</th>
+              <th>大白话职责</th>
+              <th>如何连接</th>
+              <th>主要位置</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{STRUCTURE_ROWS_HTML}}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="learning">
+      <h2>最值得学习的地方</h2>
+      {{LEARNING_POINTS_HTML}}
+    </section>
+
+    <section id="usage">
+      <h2>怎么真正用上</h2>
+      <p class="summary">{{USAGE_DECISION}}</p>
+      <div class="grid">
+        <article class="card">
+          <p class="label">最快体验</p>
+          {{QUICK_START_HTML}}
+        </article>
+        <article class="card">
+          <p class="label">接入或复用方式</p>
+          {{INTEGRATION_HTML}}
+        </article>
+        <article class="card">
+          <p class="label">最小验证</p>
+          {{MINIMUM_VALIDATION_HTML}}
+        </article>
+      </div>
+      <article class="card">
+        <p class="label">不建议做什么</p>
+        {{NOT_RECOMMENDED_HTML}}
+      </article>
+    </section>
+
+    <section id="route">
+      <h2>推荐学习入口</h2>
+      <ol class="route">
+        {{LEARNING_ROUTE_HTML}}
+      </ol>
+    </section>
+
+    <!-- 快速分析没有复核内容时，删除整个结论复核区块。 -->
+    <section id="review">
+      <h2>结论复核</h2>
+      {{REVIEW_HTML}}
+    </section>
+
+    <section id="limits">
+      <h2>局限与待确认问题</h2>
+      {{LIMITATIONS_HTML}}
+    </section>
+
+    <section class="callout">
+      <h2>一句话行动建议</h2>
+      <p>{{FINAL_ADVICE}}</p>
+    </section>
+
+    <section id="sources">
+      <h2>证据来源</h2>
+      <div class="sources">
+        {{SOURCES_HTML}}
+      </div>
+    </section>
+
+    <footer>
+      由 Github分析雷达生成 · 本报告只呈现已完成的分析，不自动评价项目好坏
+    </footer>
+  </main>
+
+  <script>
+    // 路径复制功能只处理当前按钮明确绑定的文字，不读取其他页面数据。
+    document.querySelectorAll("[data-copy-path]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const path = button.getAttribute("data-copy-path");
+        if (!path) return;
+
+        try {
+          await navigator.clipboard.writeText(path);
+          const originalText = button.textContent;
+          button.textContent = "已复制";
+          window.setTimeout(() => {
+            button.textContent = originalText;
+          }, 1400);
+        } catch {
+          button.textContent = "请手动复制";
+        }
+      });
+    });
+  </script>
+</body>
+</html>
