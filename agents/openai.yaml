@@ -1,4 +1,4 @@
 interface:
   display_name: "Github分析雷达"
-  short_description: "用证据看懂 GitHub 项目，并找到真正可执行的使用方式"
-  default_prompt: "使用 $github-analysis-radar 分析这个 GitHub 项目，告诉我它解决什么问题、我怎么实际用上，并给出最小验证步骤。"
+  short_description: "用证据看懂 GitHub 项目，并训练 AI 编程工程设计判断"
+  default_prompt: "使用 $github-analysis-radar 分析这个 GitHub 项目，告诉我它解决什么问题、怎么实际用上；当我要求工程设计陪练时，再围绕一个关键架构决定训练我。"
