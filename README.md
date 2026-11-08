@@ -14,7 +14,7 @@ Github分析雷达会先用大白话说明项目解决的现实问题，再用�
 
 | 版本 | 日期 | 主要变化 | 对应提交 |
 |---|---|---|---|
-| `v1.2.0` | 2026-11-08 | 完整讲解改为先图后短解释；有图文 Page 的平台按其自身规则发布并返回真实链接，没有则用 Markdown 和图语法；只有明确要求保存网页时才使用 HTML 模板 | 见本版本提交 |
+| `v1.2.0` | 2026-11-08 | 完整讲解改为先图后短解释；有图文 Page 的平台按其自身规则发布并返回真实链接，没有则用 Markdown 和图语法；只有明确要求保存网页时才使用 HTML 模板 | [`5ede512`](https://github.com/kellyjiao-Kelly/github-analysis-radar/commit/5ede512253101f7f7c44087890de85fa55f7c686) |
 | `v1.1.0` | 2026-08-14 | 新增 AI 编程工程设计陪练、架构思考、工程决策卡、成长复盘和防止过度设计规则 | [`e30ee17`](https://github.com/kellyjiao-Kelly/github-analysis-radar/commit/e30ee17715e13dab0cc55f3b56dfb6b51508a917) |
 | `v1.0.0` | 2026-08-13 | 建立证据化快速分析、按需深度分析、实际使用路线和安全边界 | [`2f323bc`](https://github.com/kellyjiao-Kelly/github-analysis-radar/commit/2f323bc75392d19652472a21616f530e13c4b684) |
 
