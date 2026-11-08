@@ -5,8 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="{{PROJECT_NAME}} GitHub 项目学习报告">
   <title>{{PROJECT_NAME}}｜Github分析雷达</title>
+  <!--
+    只在用户明确要求保存网页、生成 HTML、归档或长期阅读的独立网页文件时，
+    才复制本模板。完整讲解的默认载体不是本文件：
+    平台有可回访图文 Page 时，先读该平台自己的技能或文档，成功后只使用真实链接；
+    没有 Page 时用 Markdown 和该平台支持的图语法。不要假设存在 WriteCanvas 或某套沙盒组件。
+
+    每个实质模块保持：标题、图、短解释。没有独立图时，删除整个 figure，不要留空框，
+    也不要留下未替换的占位符。证据来源区不配图。
+    图注写清依据和“当前未运行验证”。示意图不是抓取结果、性能测试或真实截图。
+    不要放入真实账号、对话或隐私内容，不要模仿其他产品界面，不要伪装成项目官网。
+    多条用法是并列选项。details 只切换展示，不执行命令，也不保存选择。
+
+    图槽使用内联 SVG，并沿用 .node、.edge、.node-label，以便明暗主题都能读。
+    节点文字保持简短。示例关系（不要原样当作某个项目的结论）：
+    <svg viewBox="0 0 640 88" role="img" aria-label="示例：输入经过动作得到输出">
+      <rect class="node" x="16" y="20" width="160" height="48" rx="10"></rect>
+      <text class="node-label" x="96" y="49" text-anchor="middle">输入</text>
+      <path class="edge" d="M176 44 H232"></path>
+      <rect class="node" x="232" y="20" width="160" height="48" rx="10"></rect>
+      <text class="node-label" x="312" y="49" text-anchor="middle">动作</text>
+      <path class="edge" d="M392 44 H448"></path>
+      <rect class="node" x="448" y="20" width="160" height="48" rx="10"></rect>
+      <text class="node-label" x="528" y="49" text-anchor="middle">输出</text>
+    </svg>
+    并列选项横排，不要用箭头串成必经顺序。调度模块不要放在流水线末端。
+    命令入口和库导入分成两个节点。
+  -->
   <style>
     :root {
+      color-scheme: light dark;
       --background: #f5f7fb;
       --surface: #ffffff;
       --surface-soft: #eef4ff;
@@ -21,6 +49,10 @@
       --unknown: #a33a3a;
       --shadow: 0 16px 40px rgba(29, 48, 84, 0.08);
       --radius: 18px;
+      --nav-background: rgba(255, 255, 255, 0.92);
+      --code-background: #f7f9fc;
+      --learning-background: #fffbf3;
+      --hero-summary: #edf3ff;
     }
 
     * {
@@ -49,7 +81,7 @@
       padding: 0.14em 0.4em;
       border: 1px solid var(--border);
       border-radius: 6px;
-      background: #f7f9fc;
+      background: var(--code-background);
       color: var(--primary-dark);
       font-family: "SFMono-Regular", Consolas, monospace;
       overflow-wrap: anywhere;
@@ -89,11 +121,20 @@
       letter-spacing: -0.04em;
     }
 
-    .summary {
+    .hero .summary,
+    .hero .disclaimer {
       max-width: 780px;
+      color: var(--hero-summary);
+    }
+
+    .hero .summary {
       margin: 18px 0 0;
-      color: #edf3ff;
       font-size: clamp(1rem, 1.8vw, 1.18rem);
+    }
+
+    .hero .disclaimer {
+      margin: 12px 0 0;
+      font-size: 0.92rem;
     }
 
     .meta {
@@ -128,7 +169,7 @@
       overflow-x: auto;
       border: 1px solid var(--border);
       border-radius: 14px;
-      background: rgba(255, 255, 255, 0.92);
+      background: var(--nav-background);
       box-shadow: 0 8px 24px rgba(29, 48, 84, 0.07);
       backdrop-filter: blur(12px);
     }
@@ -162,17 +203,83 @@
       font-size: clamp(1.45rem, 3vw, 2rem);
     }
 
+    .lead {
+      margin: 0 0 16px;
+      font-size: 1.05rem;
+    }
+
+    .diagram {
+      margin: 0 0 16px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface-soft);
+    }
+
+    .diagram figcaption {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .diagram-body {
+      overflow-x: auto;
+    }
+
+    .diagram-body svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      /* 手机上不把整张图缩进窄屏，否则节点文字会小到无法阅读。窄屏改为横向滚动。 */
+      min-width: 720px;
+    }
+
+    .diagram-body .node {
+      fill: var(--surface);
+      stroke: var(--primary);
+      stroke-width: 1.5;
+    }
+
+    .diagram-body .edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.5;
+    }
+
+    .diagram-body .node-label {
+      fill: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 14px;
     }
 
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .card {
+      margin-top: 14px;
       padding: 18px;
       border: 1px solid var(--border);
       border-radius: 14px;
-      background: #ffffff;
+      background: var(--surface);
+    }
+
+    .grid .card {
+      margin-top: 0;
+    }
+
+    .paths {
+      margin-top: 14px;
     }
 
     .card h3 {
@@ -191,6 +298,29 @@
       font-size: 0.78rem;
       font-weight: 800;
       letter-spacing: 0.06em;
+    }
+
+    .paths {
+      display: grid;
+      gap: 10px;
+    }
+
+    details.path {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      padding: 12px 14px;
+    }
+
+    details.path summary {
+      min-height: 44px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    details.path summary:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 3px;
     }
 
     .structure {
@@ -215,7 +345,7 @@
       padding: 22px;
       border-left: 4px solid var(--accent);
       border-radius: 0 14px 14px 0;
-      background: #fffbf3;
+      background: var(--learning-background);
     }
 
     .learning-point + .learning-point {
@@ -225,7 +355,7 @@
     .route {
       display: grid;
       gap: 12px;
-      margin: 0;
+      margin: 14px 0 0;
       padding: 0;
       list-style: none;
       counter-reset: route-step;
@@ -236,7 +366,7 @@
       padding: 18px 18px 18px 64px;
       border: 1px solid var(--border);
       border-radius: 14px;
-      background: #ffffff;
+      background: var(--surface);
       counter-increment: route-step;
     }
 
@@ -295,7 +425,7 @@
       padding: 5px 9px;
       border: 1px solid var(--border);
       border-radius: 8px;
-      background: #ffffff;
+      background: var(--surface);
       color: var(--primary);
       cursor: pointer;
     }
@@ -327,7 +457,8 @@
         border-radius: 18px;
       }
 
-      .grid {
+      .grid,
+      .grid.two {
         grid-template-columns: 1fr;
       }
 
@@ -344,6 +475,47 @@
       }
     }
 
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --background: #101722;
+        --surface: #182232;
+        --surface-soft: #22304a;
+        --text: #e8eef8;
+        --muted: #b3c0d4;
+        --border: #31445f;
+        --primary: #9db7ff;
+        --primary-dark: #d7e3ff;
+        --accent: #e2b565;
+        --confirmed: #8fd0ae;
+        --inferred: #e2b565;
+        --unknown: #f0b0b0;
+        --shadow: none;
+        --nav-background: rgba(16, 23, 34, 0.92);
+        --code-background: #121a28;
+        --learning-background: #2c2618;
+        --hero-summary: #edf3ff;
+      }
+
+      .status.confirmed {
+        background: #143526;
+        color: #c6f3d8;
+      }
+
+      .status.inferred {
+        background: #3d3114;
+        color: #f6e0b5;
+      }
+
+      .status.unknown {
+        background: #402020;
+        color: #f6d0d0;
+      }
+
+      .nav {
+        box-shadow: none;
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       html {
         scroll-behavior: auto;
@@ -357,6 +529,7 @@
       <p class="eyebrow">GITHUB 分析雷达 · {{REPORT_TYPE}}</p>
       <h1>{{PROJECT_NAME}}</h1>
       <p class="summary">{{ONE_LINE_SUMMARY}}</p>
+      <p class="disclaimer">页内的图是结构示意。没有标明“已运行验证”的内容，都不是已经安装或运行该项目后的结果。</p>
       <div class="meta">
         <a href="{{REPOSITORY_URL}}" target="_blank" rel="noopener noreferrer">查看 GitHub 项目</a>
         <span>版本：{{VERSION}}</span>
@@ -365,36 +538,90 @@
     </header>
 
     <nav class="nav" aria-label="报告导航">
-      <a href="#overview">30 秒看懂</a>
-      <a href="#structure">核心结构</a>
-      <a href="#learning">学习重点</a>
-      <a href="#usage">怎么用上</a>
-      <a href="#route">阅读路线</a>
+      <a href="#problem">现实麻烦</a>
+      <a href="#usage">具体怎么用</a>
+      <a href="#structure">核心分工</a>
+      <a href="#learning">学习点</a>
+      <a href="#check">最小验证</a>
       <a href="#review">结论复核</a>
-      <a href="#limits">局限说明</a>
+      <a href="#limits">来源边界</a>
       <a href="#sources">证据来源</a>
     </nav>
 
-    <section id="overview">
-      <h2>30 秒看懂项目</h2>
-      <div class="grid">
+    <section id="problem">
+      <h2>现实麻烦</h2>
+      <figure class="diagram">
+        <figcaption>
+          <span class="status inferred">示意图</span>
+          {{PROBLEM_DIAGRAM_NOTE_HTML}}
+        </figcaption>
+        <div class="diagram-body">
+          {{PROBLEM_DIAGRAM_HTML}}
+        </div>
+      </figure>
+      {{PROBLEM_HTML}}
+      <article class="card">
+        <p class="label">可以确认的特点</p>
+        {{DIFFERENCE_HTML}}
+      </article>
+    </section>
+
+    <section id="usage">
+      <h2>具体怎么用</h2>
+      <figure class="diagram">
+        <figcaption>
+          <span class="status inferred">示意图</span>
+          {{USAGE_DIAGRAM_NOTE_HTML}}
+        </figcaption>
+        <div class="diagram-body">
+          {{USAGE_DIAGRAM_HTML}}
+        </div>
+      </figure>
+      <p class="lead">{{USAGE_DECISION}}</p>
+      <div class="grid two">
         <article class="card">
-          <p class="label">解决的问题</p>
-          {{PROBLEM_HTML}}
+          <p class="label">第一次做什么</p>
+          {{QUICK_START_HTML}}
         </article>
         <article class="card">
-          <p class="label">整体流程</p>
-          {{WORKFLOW_HTML}}
-        </article>
-        <article class="card">
-          <p class="label">可以确认的特点</p>
-          {{DIFFERENCE_HTML}}
+          <p class="label">接到哪里</p>
+          {{INTEGRATION_HTML}}
         </article>
       </div>
+      <!--
+        没有多条路径时删除整个 .paths。
+        有多条路径时每条使用 details，默认只展开最贴近用户的一条。
+        这些条目是并列选项，不是必须依次安装的顺序。
+        <div class="paths">
+          <p class="label">并列用法，只切换展示</p>
+          <details class="path" open>
+            <summary>直接使用</summary>
+            <p>对象、位置、输入、动作、输出。</p>
+          </details>
+        </div>
+      -->
+      <div class="paths">
+        <p class="label">并列用法，只切换展示</p>
+        {{USAGE_PATHS_HTML}}
+      </div>
+      <article class="card">
+        <p class="label">不建议做什么</p>
+        {{NOT_RECOMMENDED_HTML}}
+      </article>
     </section>
 
     <section id="structure">
-      <h2>项目核心结构</h2>
+      <h2>核心分工</h2>
+      <figure class="diagram">
+        <figcaption>
+          <span class="status inferred">示意图</span>
+          {{STRUCTURE_DIAGRAM_NOTE_HTML}}
+        </figcaption>
+        <div class="diagram-body">
+          {{STRUCTURE_DIAGRAM_HTML}}
+        </div>
+      </figure>
+      {{WORKFLOW_HTML}}
       <div class="table-wrap">
         <table class="structure">
           <thead>
@@ -414,40 +641,40 @@
 
     <section id="learning">
       <h2>最值得学习的地方</h2>
+      <!-- 学习点和核心分工是同一张图时，删除下面整个 figure。 -->
+      <figure class="diagram">
+        <figcaption>
+          <span class="status inferred">示意图</span>
+          {{LEARNING_DIAGRAM_NOTE_HTML}}
+        </figcaption>
+        <div class="diagram-body">
+          {{LEARNING_DIAGRAM_HTML}}
+        </div>
+      </figure>
       {{LEARNING_POINTS_HTML}}
     </section>
 
-    <section id="usage">
-      <h2>怎么真正用上</h2>
-      <p class="summary">{{USAGE_DECISION}}</p>
-      <div class="grid">
-        <article class="card">
-          <p class="label">最快体验</p>
-          {{QUICK_START_HTML}}
-        </article>
-        <article class="card">
-          <p class="label">接入或复用方式</p>
-          {{INTEGRATION_HTML}}
-        </article>
-        <article class="card">
-          <p class="label">最小验证</p>
-          {{MINIMUM_VALIDATION_HTML}}
-        </article>
-      </div>
+    <section id="check">
+      <h2>最小验证</h2>
+      <figure class="diagram">
+        <figcaption>
+          <span class="status inferred">示意图</span>
+          {{VALIDATION_DIAGRAM_NOTE_HTML}}
+        </figcaption>
+        <div class="diagram-body">
+          {{VALIDATION_DIAGRAM_HTML}}
+        </div>
+      </figure>
       <article class="card">
-        <p class="label">不建议做什么</p>
-        {{NOT_RECOMMENDED_HTML}}
+        <p class="label">看到什么算用上</p>
+        {{MINIMUM_VALIDATION_HTML}}
       </article>
-    </section>
-
-    <section id="route">
-      <h2>推荐学习入口</h2>
       <ol class="route">
         {{LEARNING_ROUTE_HTML}}
       </ol>
     </section>
 
-    <!-- 快速分析没有复核内容时，删除整个结论复核区块。 -->
+    <!-- 快速分析没有复核内容时，删除整个结论复核区块，并删掉导航里的对应链接。 -->
     <section id="review">
       <h2>结论复核</h2>
       {{REVIEW_HTML}}
@@ -471,7 +698,7 @@
     </section>
 
     <footer>
-      由 Github分析雷达生成 · 本报告只呈现已完成的分析，不自动评价项目好坏
+      由 Github分析雷达生成 · 本报告只呈现已完成的分析，不自动评价项目好坏，也不是项目官方页面
     </footer>
   </main>
 
