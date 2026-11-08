@@ -1,4 +1,4 @@
 interface:
   display_name: "Github分析雷达"
-  short_description: "用证据看懂 GitHub 项目，并训练 AI 编程工程设计判断"
-  default_prompt: "使用 $github-analysis-radar 分析这个 GitHub 项目，告诉我它解决什么问题、怎么实际用上；当我要求工程设计陪练时，再围绕一个关键架构决定训练我。"
+  short_description: "用证据和图文看懂 GitHub 项目，并训练工程设计判断"
+  default_prompt: "使用 $github-analysis-radar 分析这个 GitHub 项目。多个候选时先让我选择。完整讲解按现实麻烦、具体用法、核心分工、学习点、最小验证和来源边界组织，每个实质模块先给准确简图再写短解释。当前工具有可回访的图文 Page 就按其文档发布并给我真实链接，没有就用 Markdown 和它支持的图。我只问短问题时直接简答；只有我要求保存网页时才生成 HTML。我要求工程设计陪练时，再围绕一个关键架构决定训练我。"
